@@ -25,9 +25,9 @@ import runTest from './run_test';
 
 type WorkerData = {|
   config: ProjectConfig,
-    globalConfig: GlobalConfig,
-      path: Path,
-        rawModuleMap?: RawModuleMap,
+  globalConfig: GlobalConfig,
+  path: Path,
+  rawModuleMap?: RawModuleMap,
 |};
 
 type WorkerCallback = (error: ?SerializableError, result?: TestResult) => void;

@@ -21,28 +21,28 @@ import chalk from 'chalk';
 
 type ResolverConfig = {|
   browser?: boolean,
-    defaultPlatform: ?string,
-      extensions: Array<string>,
-        hasCoreModules: boolean,
-          moduleDirectories: Array<string>,
-            moduleNameMapper: ?Array<ModuleNameMapperConfig>,
-              modulePaths: Array<Path>,
-                platforms?: Array<string>,
-                resolver: ?Path,
+  defaultPlatform: ?string,
+  extensions: Array<string>,
+  hasCoreModules: boolean,
+  moduleDirectories: Array<string>,
+  moduleNameMapper: ?Array<ModuleNameMapperConfig>,
+  modulePaths: Array<Path>,
+  platforms?: Array<string>,
+  resolver: ?Path,
 |};
 
 type FindNodeModuleConfig = {|
   basedir: Path,
-    browser?: boolean,
-    extensions?: Array<string>,
-    moduleDirectory?: Array<string>,
-    paths?: Array<Path>,
-    resolver?: ?Path,
+  browser?: boolean,
+  extensions?: Array<string>,
+  moduleDirectory?: Array<string>,
+  paths?: Array<Path>,
+  resolver?: ?Path,
 |};
 
 type ModuleNameMapperConfig = {|
   regex: RegExp,
-    moduleName: string,
+  moduleName: string,
 |};
 
 type BooleanObject = {[key: string]: boolean};
@@ -54,10 +54,10 @@ const cwd = process.cwd();
 const resolvedCwd = fs.realpathSync(cwd) || cwd;
 const nodePaths = process.env.NODE_PATH
   ? process.env.NODE_PATH
-    .split(path.delimiter)
-    .filter(Boolean)
-    // The resolver expects absolute paths.
-    .map(p => path.resolve(resolvedCwd, p))
+      .split(path.delimiter)
+      .filter(Boolean)
+      // The resolver expects absolute paths.
+      .map(p => path.resolve(resolvedCwd, p))
   : null;
 
 class Resolver {
@@ -74,7 +74,7 @@ class Resolver {
       defaultPlatform: options.defaultPlatform,
       extensions: options.extensions,
       hasCoreModules:
-      options.hasCoreModules === undefined ? true : options.hasCoreModules,
+        options.hasCoreModules === undefined ? true : options.hasCoreModules,
       moduleDirectories: options.moduleDirectories || ['node_modules'],
       moduleNameMapper: options.moduleNameMapper,
       modulePaths: options.modulePaths,
@@ -91,7 +91,7 @@ class Resolver {
   static findNodeModule(path: Path, options: FindNodeModuleConfig): ?Path {
     const resolver = options.resolver
       ? /* $FlowFixMe */
-      require(options.resolver)
+        require(options.resolver)
       : defaultResolver;
     const paths = options.paths;
 
@@ -282,69 +282,69 @@ class Resolver {
     from: Path,
     moduleName: string,
   ): ?string {
-  if (this.isCoreModule(moduleName)) {
-    return moduleName;
+    if (this.isCoreModule(moduleName)) {
+      return moduleName;
+    }
+    return this._isModuleResolved(from, moduleName)
+      ? this.getModule(moduleName)
+      : this._getVirtualMockPath(virtualMocks, from, moduleName);
   }
-  return this._isModuleResolved(from, moduleName)
-    ? this.getModule(moduleName)
-    : this._getVirtualMockPath(virtualMocks, from, moduleName);
-}
 
-_getMockPath(from: Path, moduleName: string): ?string {
-  return !this.isCoreModule(moduleName)
-    ? this.getMockModule(from, moduleName)
-    : null;
-}
+  _getMockPath(from: Path, moduleName: string): ?string {
+    return !this.isCoreModule(moduleName)
+      ? this.getMockModule(from, moduleName)
+      : null;
+  }
 
-_getVirtualMockPath(
-  virtualMocks: BooleanObject,
-  from: Path,
-  moduleName: string,
-): Path {
-  const virtualMockPath = this.getModulePath(from, moduleName);
-  return virtualMocks[virtualMockPath]
-    ? virtualMockPath
-    : moduleName ? this.resolveModule(from, moduleName) : from;
-}
+  _getVirtualMockPath(
+    virtualMocks: BooleanObject,
+    from: Path,
+    moduleName: string,
+  ): Path {
+    const virtualMockPath = this.getModulePath(from, moduleName);
+    return virtualMocks[virtualMockPath]
+      ? virtualMockPath
+      : moduleName ? this.resolveModule(from, moduleName) : from;
+  }
 
-_isModuleResolved(from: Path, moduleName: string): boolean {
-  return !!(
-    this.getModule(moduleName) || this.getMockModule(from, moduleName)
-  );
-}
+  _isModuleResolved(from: Path, moduleName: string): boolean {
+    return !!(
+      this.getModule(moduleName) || this.getMockModule(from, moduleName)
+    );
+  }
 
-_resolveStubModuleName(from: Path, moduleName: string): ?Path {
-  const dirname = path.dirname(from);
-  const paths = this._options.modulePaths;
-  const extensions = this._options.extensions;
-  const moduleDirectory = this._options.moduleDirectories;
-  const moduleNameMapper = this._options.moduleNameMapper;
+  _resolveStubModuleName(from: Path, moduleName: string): ?Path {
+    const dirname = path.dirname(from);
+    const paths = this._options.modulePaths;
+    const extensions = this._options.extensions;
+    const moduleDirectory = this._options.moduleDirectories;
+    const moduleNameMapper = this._options.moduleNameMapper;
 
-  if (moduleNameMapper) {
-    for (const {moduleName: mappedModuleName, regex} of moduleNameMapper) {
-      if (regex.test(moduleName)) {
-        const matches = moduleName.match(regex);
-        if (!matches) {
-          moduleName = mappedModuleName;
-        } else {
-          moduleName = mappedModuleName.replace(
-            /\$([0-9]+)/g,
-            (_, index) => matches[parseInt(index, 10)],
-          );
-        }
+    if (moduleNameMapper) {
+      for (const {moduleName: mappedModuleName, regex} of moduleNameMapper) {
+        if (regex.test(moduleName)) {
+          const matches = moduleName.match(regex);
+          if (!matches) {
+            moduleName = mappedModuleName;
+          } else {
+            moduleName = mappedModuleName.replace(
+              /\$([0-9]+)/g,
+              (_, index) => matches[parseInt(index, 10)],
+            );
+          }
 
-        const module =
-          this.getModule(moduleName) ||
-          Resolver.findNodeModule(moduleName, {
-            basedir: dirname,
-            browser: this._options.browser,
-            extensions,
-            moduleDirectory,
-            paths,
-          });
-        if (!module) {
-          const error = new Error(
-            chalk.red(`${chalk.bold('Configuration error')}:
+          const module =
+            this.getModule(moduleName) ||
+            Resolver.findNodeModule(moduleName, {
+              basedir: dirname,
+              browser: this._options.browser,
+              extensions,
+              moduleDirectory,
+              paths,
+            });
+          if (!module) {
+            const error = new Error(
+              chalk.red(`${chalk.bold('Configuration error')}:
 
 Unknown module in configuration option ${chalk.bold('moduleNameMapper')}
 Please check:
@@ -352,20 +352,20 @@ Please check:
 "moduleNameMapper": {
   "${regex.toString()}": "${chalk.bold(moduleName)}"
 }`),
-          );
-          error.stack = '';
-          throw error;
+            );
+            error.stack = '';
+            throw error;
+          }
+          return module;
         }
-        return module;
       }
     }
+    return null;
   }
-  return null;
-}
 
-_supportsNativePlatform() {
-  return (this._options.platforms || []).indexOf(NATIVE_PLATFORM) !== -1;
-}
+  _supportsNativePlatform() {
+    return (this._options.platforms || []).indexOf(NATIVE_PLATFORM) !== -1;
+  }
 }
 
 module.exports = Resolver;
