@@ -9,6 +9,7 @@
  */
 
 import type {Path} from 'types/Config';
+import type {HasteFS} from 'types/HasteMap';
 
 import browserResolve from 'browser-resolve';
 
@@ -18,6 +19,7 @@ type ResolverOptions = {|
   extensions?: Array<string>,
   moduleDirectory?: Array<string>,
   paths?: ?Array<Path>,
+  hasteFS?: HasteFS,
 |};
 
 function defaultResolver(path: Path, options: ResolverOptions) {
@@ -28,6 +30,7 @@ function defaultResolver(path: Path, options: ResolverOptions) {
     extensions: options.extensions,
     moduleDirectory: options.moduleDirectory,
     paths: options.paths,
+    hasteFS: options.hasteFS,
   });
 }
 
@@ -41,7 +44,7 @@ function resolveSync(x, options) {
     throw new TypeError('Path must be a string.');
   }
   var opts = options || {};
-  var isFile = opts.isFile || function (file) {
+  function isFile(file: string): boolean {
     try {
       var stat = fs.statSync(file);
     } catch (e) {
@@ -49,8 +52,8 @@ function resolveSync(x, options) {
       throw e;
     }
     return stat.isFile() || stat.isFIFO();
-  };
-  var readFileSync = opts.readFileSync || fs.readFileSync;
+  }
+  var readFileSync = fs.readFileSync;
 
   var extensions = opts.extensions || ['.js'];
   var y = opts.basedir; // guaranteed to be defined

@@ -25,9 +25,9 @@ import runTest from './run_test';
 
 type WorkerData = {|
   config: ProjectConfig,
-  globalConfig: GlobalConfig,
-  path: Path,
-  rawModuleMap?: RawModuleMap,
+    globalConfig: GlobalConfig,
+      path: Path,
+        rawModuleMap?: RawModuleMap,
 |};
 
 type WorkerCallback = (error: ?SerializableError, result?: TestResult) => void;
@@ -61,9 +61,11 @@ const getResolver = (config, rawModuleMap) => {
   } else {
     const name = config.name;
     if (!resolvers[name]) {
+      const hasteMap = Runtime.createHasteMap(config);
       resolvers[name] = Runtime.createResolver(
         config,
-        Runtime.createHasteMap(config).readModuleMap(),
+        hasteMap.hasteFS,
+        hasteMap.moduleMap
       );
     }
     return resolvers[name];

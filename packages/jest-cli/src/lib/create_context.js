@@ -21,5 +21,5 @@ module.exports = (
   config,
   hasteFS,
   moduleMap,
-  resolver: Runtime.createResolver(config, moduleMap),
+  resolver: Runtime.createResolver(config, hasteFS, moduleMap),
 });

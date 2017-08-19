@@ -30,20 +30,20 @@ import cliArgs from './cli/args';
 
 type Module = {|
   children?: Array<any>,
-  exports: any,
-  filename: string,
-  id: string,
-  parent?: Module,
-  paths?: Array<Path>,
-  require?: Function,
+    exports: any,
+      filename: string,
+        id: string,
+          parent?: Module,
+          paths?: Array<Path>,
+          require?: Function,
 |};
 
 type HasteMapOptions = {|
   console?: Console,
-  maxWorkers: number,
-  resetCache: boolean,
-  watch?: boolean,
-  watchman: boolean,
+    maxWorkers: number,
+      resetCache: boolean,
+        watch?: boolean,
+        watchman: boolean,
 |};
 
 type InternalModuleOptions = {|
@@ -54,7 +54,7 @@ type CoverageOptions = {
   collectCoverage: boolean,
   collectCoverageFrom: Array<Glob>,
   collectCoverageOnlyFrom: ?{[key: string]: boolean},
-  mapCoverage: boolean,
+mapCoverage: boolean,
 };
 
 type BooleanObject = {[key: string]: boolean};
@@ -212,7 +212,7 @@ class Runtime {
         config,
         hasteFS: hasteMap.hasteFS,
         moduleMap: hasteMap.moduleMap,
-        resolver: Runtime.createResolver(config, hasteMap.moduleMap),
+        resolver: Runtime.createResolver(config, hasteMap.hasteFS, hasteMap.moduleMap),
       }),
       error => {
         throw error;
@@ -247,8 +247,8 @@ class Runtime {
     });
   }
 
-  static createResolver(config: ProjectConfig, moduleMap: ModuleMap): Resolver {
-    return new Resolver(moduleMap, {
+  static createResolver(config: ProjectConfig, hasteFS: HasteFS, moduleMap: ModuleMap): Resolver {
+    return new Resolver(hasteFS, moduleMap, {
       browser: config.browser,
       defaultPlatform: config.haste.defaultPlatform,
       extensions: config.moduleFileExtensions.map(extension => '.' + extension),
@@ -529,7 +529,7 @@ class Runtime {
         filename,
         // $FlowFixMe
         (localModule.require: LocalModuleRequire),
-      ), // jest object
+    ), // jest object
     );
 
     this._isCurrentlyExecutingManualMock = origCurrExecutingManualMock;
@@ -565,7 +565,7 @@ class Runtime {
       if (mockMetadata == null) {
         throw new Error(
           `Failed to get mock metadata: ${modulePath}\n\n` +
-            `See: http://facebook.github.io/jest/docs/manual-mocks.html#content`,
+          `See: http://facebook.github.io/jest/docs/manual-mocks.html#content`,
         );
       }
       this._mockMetaDataCache[modulePath] = mockMetadata;
@@ -734,8 +734,8 @@ class Runtime {
       this._environment.global.jasmine
         ? (this._environment.global.jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout)
         : (this._environment.global[
-            Symbol.for('TEST_TIMEOUT_SYMBOL')
-          ] = timeout);
+          Symbol.for('TEST_TIMEOUT_SYMBOL')
+        ] = timeout);
       return jestObject;
     };
 
